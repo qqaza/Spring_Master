@@ -1,91 +1,108 @@
 package com.example.demo.emp.web;
 
-import java.util.List;
+import java.io.File;
+import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.demo.emp.EmpVo;
 import com.example.demo.emp.SearchVO;
 import com.example.demo.emp.mapper.EmpMapper;
 
-@Controller // 컨테이너 빈 등록 + 사용자요청처리할 커맨드 핸들러 변환
+import lombok.RequiredArgsConstructor;
+
+@Controller // 컨테이너 빈 등록 + 사용자요청 처리할 수 있는 커맨드 핸들러 변환
+@RequiredArgsConstructor
 public class EmpController {
 	
-	@Autowired EmpMapper mapper; //의존성 주입 (DI = Dependency Injection)
+	// 생성자주입 
+	final EmpMapper mapper; // 의존성주입 (DI dependency Injection) - 객체관리를 스프링이 알아서 다해줌
 	
-	@RequestMapping("/ajaxEmp")
-	@ResponseBody
-	public List<EmpVo> ajaxEmp(){
-		return mapper.getEmpList(null, null);
+	// 등록페이지 이동
+	@GetMapping("/emp/insert")
+	public void insert() {}
+	
+	@PostMapping("/insert")
+	public String insert(@ModelAttribute("emp") EmpVo vo, MultipartFile[] photos) throws IllegalStateException, IOException {
+	System.out.println(vo);
+	if(photos != null) {
+		for(MultipartFile photo : photos) {
+			if(photo.getSize() > 0) {
+				File file = new File("d:/upload", photo.getOriginalFilename());
+				photo.transferTo(file);
+				
+				System.out.println(photo.getOriginalFilename());
+				System.out.println(photo.getSize());
+				
+				vo.setPhoto(photo.getOriginalFilename());
+			}
+		}
+	}
+	mapper.insertEmp(vo);
+	return "redirect:/emp/list";
+}
+	
+	// 수정페이지 이동
+	@GetMapping("/emp/update")
+	public void update() {}
+	
+	// 수정처리
+	@PostMapping("/update")
+	public String update(@ModelAttribute("emp") EmpVo vo) {
+		System.out.println(vo);
+		mapper.updateEmp(vo);
+		return "redirect:/emp/list";
+	}
+		
+	// 삭제처리
+	@RequestMapping("/emp/delete/{employeeId}")
+	public String delete(@PathVariable int employeeId){ 
+		System.out.println("employeeId : " + employeeId);
+		mapper.deleteEmp(employeeId);
+		return "redirect:/emp/list";
 	}
 	
-	//ajax응답과 비슷함
-	@PostMapping("/insert2")  //148교재
-	public ResponseEntity<EmpVo> insert2(EmpVo vo) {
-		return new ResponseEntity<>(vo , HttpStatus.OK);
+	// 상세조회
+	@RequestMapping("/emp/info/{employeeId}")
+	public String empInfo(@PathVariable int employeeId, Model model){ 
+		System.out.println("employeeId : " + employeeId);
+		model.addAttribute("emp", mapper.getEmpInfo(employeeId));
+		return "emp/info";
 	}
 	
-	@RequestMapping("/empResult") //redirect URL
-	public String result() { 
-		return "result";
-	}
-	//조회
-	@RequestMapping("/empList") //forward
-	public String empList(Model model, EmpVo vo, SearchVO svo){
+	// 목록페이지로 이동
+	@RequestMapping("/emp/list")
+	public String empList(Model model, EmpVo vo, SearchVO svo){ 
 		model.addAttribute("empList", mapper.getEmpList(vo, svo));
-		return "emp/list"; 
+		return "emp/list";
 	}
 	
-	@PostMapping("/insert3")   //redirect 등록 수정 삭제 할때 사용
+	@PostMapping("/insert3")
 	public String insert3(EmpVo vo, RedirectAttributes rttr) {
-		System.out.println("등록:" + vo);
+		System.out.println("등록 : " + vo);
 		rttr.addAttribute("insertResult", "성공");
-		rttr.addFlashAttribute("flashResult", "한번만");
+		rttr.addFlashAttribute("flashResult", "한번만 사용가능");
 		return "redirect:empResult";
 	}
 	
-	
-	
-	@PostMapping("/insert")
-
-	public ModelAndView insert(@ModelAttribute("emp") EmpVo vo, Model model) {
-		System.out.println(vo);
-//		mapper.insertEmp(vo);
-		//커맨드객체는 자동으로 model에 추가되고 view페이지에 볼수있음
-		//model.addAttribute("empVo", vo);
-//		model.addAttribute("insertResult", "success");
-		
-		ModelAndView mv = new ModelAndView();
-		mv.setViewName("result");
-		mv.addObject("insertResult", "success");
-		mv.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-		return mv; //페이지 명(result)
-		
+	@PostMapping("/insert2")
+	public ResponseEntity<EmpVo> insert2(EmpVo vo) {
+		return new ResponseEntity<>(vo, HttpStatus.OK);
 	}
-		
 	
 	@GetMapping("/")
 	public String test() {
-		return "index"; //리턴값이 /tamplate/index.html 을 찾아서 페이지를 넘겨준다
+		return "index";
 	}
-	
-	
-	
-//	@RequestMapping("/empList")
-//	public String empList(Model model){
-//		model.addAttribute("empList", mapper.getEmpList(null, null));
-//		return "empList"; 
-//	}
-		
 }

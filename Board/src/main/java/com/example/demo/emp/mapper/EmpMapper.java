@@ -14,4 +14,5 @@ public interface EmpMapper {
 	    int insertEmp(EmpVo empVO); // 등록
 		int deleteEmp(int employeeId); // 삭제
 		List<Map<String,Object>>getStat();
+		int updateEmp(EmpVo empVo);
 }

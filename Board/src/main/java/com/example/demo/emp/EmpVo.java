@@ -25,6 +25,8 @@ public class EmpVo { //등록VO
 	 String departmentId;
 	 String managerId;
 	 String phone;
+	 
+	 
 	 String photo;
 	 
 }

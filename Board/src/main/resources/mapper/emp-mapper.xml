@@ -28,29 +28,21 @@
 	
 	</sql>
 	
-	<resultMap type="EmpVo" id="empresultMap">
-		<id property="employeeId" column="EMPLOYEE_ID"/>
+	<resultMap type="EmpVO" id="empResultMap">
+		<id property="employeeId" column="EMPLOYEE_ID" />
 		<result property="firstName" column="FIRST_NAME" />
-		<result property="phone" column="phone_number" />
-		
+		<result property="phone" column="PHONE_NUMBER" />
 	</resultMap>
-	<select id="getEmpList" resultMap="empresultMap">
- SELECT * FROM( SELECT ROWNUM as rn , a.* FROM(
- 
-     SELECT e.EMPLOYEE_ID
-		,FIRST_NAME
-		,LAST_NAME
-		,EMAIL
-		,PHONE_NUMBER
-		,HIRE_DATE
-		,JOB_ID
-		,SALARY
-		,COMMISSION_PCT
-		,MANAGER_ID
-		,DEPARTMENT_ID
-     FROM employees e
-    <include refid="condition"></include>
-     ORDER BY employee_id desc
+	<select id="getEmpList" resultMap="empResultMap">
+	SELECT * FROM ( SELECT rownum rn, a.* FROM (
+	
+		SELECT rownum id, e.*
+		  FROM employees e
+	  <include refid="condition"></include>
+	  ORDER BY employee_id DESC		
+	  
+	) a WHERE rownum <![CDATA[<=]]> #{svo.end} ) b WHERE rn >= #{svo.start}
+	</select>
                     
 <![CDATA[  
  )a WHERE ROWNUM <= #{svo.end} ) b WHERE rn >= #{svo.start}
@@ -64,32 +56,46 @@
 	</select>
 	
 	<insert id="insertEmp" 
-				parameterType="EmpVO">
-	<selectKey keyProperty="employeeId" 
-				order="BEFORE" 
-				resultType="int">
-		select employees_seq.nextval from dual
-	</selectKey>
-	INSERT INTO employees
-			(EMPLOYEE_ID
-			,FIRST_NAME
-			,LAST_NAME
-			,EMAIL
-			,HIRE_DATE
-			,JOB_ID
-			<if test="salary != null">,SALARY</if>
-			,MANAGER_ID
-			,DEPARTMENT_ID)	
-	VALUES(
-		   #{employeeId}
-		  ,#{firstName}
-		  ,#{lastName}
-		  ,#{email}
-		  ,#{hireDate}
-		  ,#{jobId}
-		  <if test="salary != null">,#{salary}</if>
-		  ,#{managerId}
-		  ,#{departmentId}
+	        parameterType="EmpVO">
+		<selectKey keyProperty="employeeId"
+		           order="BEFORE"
+		           resultType="int">
+			SELECT employees_seq.nextval 
+			  FROM dual
+		</selectKey>
+		INSERT INTO employees
+			(
+			  employee_id
+			, first_name
+			, last_name
+			, email
+			, phone_number
+			, hire_date
+			, job_id
+			<if test="salary != null">
+			, salary
+			</if>
+			, commission_pct
+			, manager_id
+			, department_id
+			, photo
+			)
+		VALUES
+			(
+			  #{employeeId}
+			, #{firstName}
+			, #{lastName}
+			, #{email}
+			, #{phoneNumber}
+			, #{hireDate}
+			, #{jobId}
+			<if test="salary != null">
+			, #{salary}
+			</if>
+			, #{commissionPct}
+			, #{managerId}
+			, #{departmentId}
+			, #{photo}
 			)
 	</insert>
 	
@@ -98,14 +104,14 @@
 		WHERE employee_id = #{employeeId}
 	</delete>
 	
-	<select id="getStat" resultType="map">
-  SELECT e.department_id, 
-	 d.department_name, 
-	 count(*) cnt 
-  FROM employees e 
-	JOIN departments d 
-	ON e.department_id = d.department_id
-  WHERE e.department_id IS NOT NULL
-  GROUP BY e.department_id, department_name
+	<<select id="getStat" resultType="map">
+		SELECT e.department_id "id"
+			 , d.department_name "name"
+			 , count(*) "cnt"
+		  FROM employees e 
+		  JOIN departments d
+	 	    ON e.department_id = d.department_id
+	     WHERE e.department_id IS NOT NULL
+	  GROUP BY e.department_id, d.department_name
 	</select>
 </mapper>
