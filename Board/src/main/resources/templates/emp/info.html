@@ -1,14 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
 </head>
 <body>
-	<h2>사원조회</h2>
-	<form action="/emp/delete/105" method="get">
-		[[${emp.firstName}]]
-		<button>삭제</button>
+	<h2>사원상세조회</h2>
+	<form action="/emp/delete/215" method="get">
+		<div>사원명
+		<span th:text="|${emp.lastName} ${emp.firstName}|"></span>
+		</div>
+		<div>사원번호:
+		<span th:text="${emp.employeeId}"></span>
+		</div>
+		<div>입사일:
+		<span th:text="${#dates.format(emp.hireDate,'yyyy-MM-dd')}"></span>
+		</div>
+		<div>급여:
+		<span th:text="${#numbers.formatDecimal(emp.salary,3,'COMMA',0,'POINT')}"></span>
+		</div>
+		
+		<button>저장</button>
 	</form>
 </body>
 

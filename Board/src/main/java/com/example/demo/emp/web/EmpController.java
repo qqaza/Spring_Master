@@ -30,33 +30,34 @@ public class EmpController {
 	final EmpMapper mapper; // 의존성주입 (DI dependency Injection) - 객체관리를 스프링이 알아서 다해줌
 	
 	// 등록페이지 이동
-	@GetMapping("/emp/insert")
-	public void insert() {}
-	
-	@PostMapping("/insert")
-	public String insert(@ModelAttribute("emp") EmpVo vo, MultipartFile[] photos) throws IllegalStateException, IOException {
-	System.out.println(vo);
-	if(photos != null) {
-		for(MultipartFile photo : photos) {
-			if(photo.getSize() > 0) {
-				File file = new File("d:/upload", photo.getOriginalFilename());
-				photo.transferTo(file);
-				
-				System.out.println(photo.getOriginalFilename());
-				System.out.println(photo.getSize());
-				
-				vo.setPhoto(photo.getOriginalFilename());
-			}
-		}
-	}
-	mapper.insertEmp(vo);
-	return "redirect:/emp/list";
-}
+		@GetMapping("/emp/insert")
+		public void insert() { }
+		
+		// 등록 처리 --> photo  employees 테이블에 photo 컬럼 추가
+		@PostMapping("/insert")
+		public String insert(@ModelAttribute("emp") EmpVo vo, MultipartFile photoFile) throws IllegalStateException, IOException {
+			// 파일 업로드
+			File file = new File("d:/upload", photoFile.getOriginalFilename());
+			photoFile.transferTo(file);
+			
+			vo.setPhoto(photoFile.getOriginalFilename());
+			System.out.println(vo);
+			mapper.insertEmp(vo);
+			return "redirect:/emp/list";
+		}	
+
 	
 	// 수정페이지 이동
-	@GetMapping("/emp/update")
-	public void update() {}
-	
+//	@GetMapping("/emp/update/")
+//	public void update() {}
+//	
+		@RequestMapping("/emp/update/{employeeId}")
+		public String empUpdate(@PathVariable int employeeId, Model model){ 
+			System.out.println("employeeId : " + employeeId);
+			model.addAttribute("emp", mapper.getEmpInfo(employeeId));
+			return "emp/update";
+		}
+		
 	// 수정처리
 	@PostMapping("/update")
 	public String update(@ModelAttribute("emp") EmpVo vo) {

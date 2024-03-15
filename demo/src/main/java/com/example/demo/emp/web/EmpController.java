@@ -9,13 +9,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.demo.board.EmpVo;
+import com.example.demo.emp.EmpVo;
+import com.example.demo.emp.SearchVO;
 import com.example.demo.emp.mapper.EmpMapper;
 
 @Controller // 컨테이너 빈 등록 + 사용자요청처리할 커맨드 핸들러 변환
@@ -41,8 +43,9 @@ public class EmpController {
 	}
 	
 	@RequestMapping("/empList") //forward
-	public String empList(Model model){
-		model.addAttribute("empList", mapper.getEmpList(null, null));
+	public String empList(Model model, EmpVo vo, SearchVO svo){
+		model.addAttribute("copmpanyName", "<i>예담주식회사</i>");
+		model.addAttribute("empList", mapper.getEmpList(vo, svo));
 		return "empList"; 
 	}
 	
@@ -74,6 +77,18 @@ public class EmpController {
 	}
 		
 	
+	@GetMapping("/update/{empId}")
+	public String update(@PathVariable int empId) {
+		System.out.println(empId);
+		return "index"; //리턴값이 /tamplate/index.html 을 찾아서 페이지를 넘겨준다
+	}
+	
+	@GetMapping("/delete")
+	public String delete(int employeeId, String name) {
+		System.out.println(employeeId + ":" + name);
+		return "index"; //리턴값이 /tamplate/index.html 을 찾아서 페이지를 넘겨준다
+	}
+	
 	@GetMapping("/")
 	public String test() {
 		return "index"; //리턴값이 /tamplate/index.html 을 찾아서 페이지를 넘겨준다
@@ -82,8 +97,8 @@ public class EmpController {
 	
 	
 //	@RequestMapping("/empList")
-//	public String empList(Model model){
-//		model.addAttribute("empList", mapper.getEmpList(null, null));
+//	public String empList(Model model,EmpVo vo, SearchVO svo){
+//		model.addAttribute("empList", mapper.getEmpList(vo, svo));
 //		return "empList"; 
 //	}
 		

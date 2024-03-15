@@ -5,19 +5,28 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<h2>사원목록</h2>
+	<h2>사원목록</h2> 
 	<table>
 		<tr>
 			<th>employee_id</th>
-			<th>first_name</th>
-			<th>last_name</th>
+			<th>NAME</th>
+			<th>hire_date</th>
+			<th>salary</th>
+			<th>수정|삭제</th>
+
 		</tr>
 		<tr th:each="emp : ${empList}">
 			<td th:text="${emp.employeeId}"></td>
-			<td th:text="${emp.firstName}"></td>
-			<td th:text="${emp.lastName}"></td>
-			<td th:text="${emp.hireDate}"></td>
+			<td th:text="|${emp.firstName} ${emp.lastName}|"></td>
+			<td th:text="${#dates.format(emp.hireDate,'yyyy-MM-dd')}"></td>
+			<td th:text="${#numbers.formatDecimal(emp.salary,3,'COMMA',0,'POINT')+'원'}"></td>
+			<td><!--/*  localhost:8081/update/100  */-->
+				<a th:href="@{/emp/update/{id}(id=${emp.employeeId})}">|수정|</a>
+				<!--/*  localhost:8081/delete?employeeId=100$$name=xxx */-->
+				<a th:href="@{/delete(employeeId=${emp.employeeId},name=${emp.firstName})}">|삭제|</a>
+			</td>
 		</tr>
+	
 	</table>
 </body>
 </html>

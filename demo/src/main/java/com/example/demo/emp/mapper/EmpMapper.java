@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import com.example.demo.board.EmpVo;
-import com.example.demo.board.SearchVO;
+import com.example.demo.emp.EmpVo;
+import com.example.demo.emp.SearchVO;
 @Mapper
 public interface EmpMapper {
 	List<EmpVo> getEmpList(EmpVo vo, SearchVO svo); //전체조회 , 페이징

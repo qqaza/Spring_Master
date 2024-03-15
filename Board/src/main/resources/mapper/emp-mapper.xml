@@ -1,117 +1,113 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
- "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.demo.emp.mapper.EmpMapper">
 	<sql id="condition">
-	<where>
-                    	<if test="vo.departmentId != null">
-                    	department_id=#{departmentId}
-                    	</if>
-                    	<if test="vo.firstName != null">
-                    AND first_name = #{firstName}
-                    </if>
-                    <if test="vo.managerId != null">
-                    AND manager_id = #{managerId}
-                    </if>
-                    <if test="svo.employeeIds != null">
-                    	AND employee_id
-                     <foreach collection="svo.employeeIds"
-                     		  item="empid"
-                              open="in ("
-                              close=")" 
-                     		  separator=",">
-                     	#{empid}
-                     
-                     </foreach>
-                    </if>
-                    </where>	
-	
+		<where>
+	  	  	<if test ="vo.departmentId != null">
+	  	  		department_id = #{vo.departmentId}
+	  	  	</if>
+	  	  	<if test ="vo.firstName != null">
+	  	    	AND first_name = #{vo.firstName}
+	  	    </if>
+	  	    <if test ="vo.managerId != null">
+	  	    	AND manager_id = #{vo.managerId}
+	  	    </if>
+	  	    <if test ="svo.employeeIds != null">
+	  	    	AND employee_id 
+	  	    	<foreach collection="svo.employeeIds" item="empid" open="in (" close=")" separator=",">
+	  	    		#{empid}
+	  	    	</foreach>
+	  	    </if>
+	  	</where>
+	  	     ) a WHERE rownum <![CDATA[  <=  ]]> #{svo.end} ) b WHERE rn >= #{svo.start}
+	  	    ORDER BY employee_id desc
 	</sql>
-	
 	<resultMap type="EmpVO" id="empResultMap">
 		<id property="employeeId" column="EMPLOYEE_ID" />
 		<result property="firstName" column="FIRST_NAME" />
 		<result property="phone" column="PHONE_NUMBER" />
 	</resultMap>
-	<select id="getEmpList" resultMap="empResultMap">
-	SELECT * FROM ( SELECT rownum rn, a.* FROM (
 	
-		SELECT rownum id, e.*
-		  FROM employees e
-	  <include refid="condition"></include>
-	  ORDER BY employee_id DESC		
-	  
-	) a WHERE rownum <![CDATA[<=]]> #{svo.end} ) b WHERE rn >= #{svo.start}
-	</select>
-                    
-<![CDATA[  
- )a WHERE ROWNUM <= #{svo.end} ) b WHERE rn >= #{svo.start}
- ]]>
+	<select id="getEmpList" resultMap="empResultMap">
+	 SELECT * FROM (SELECT rownum as rn, a.* FROM (
+	 
+		 SELECT EMPLOYEE_ID,
+				FIRST_NAME,
+				LAST_NAME,
+				EMAIL,
+				PHONE_NUMBER "phone",
+				HIRE_DATE,
+				JOB_ID,
+				SALARY,
+				COMMISSION_PCT,
+				MANAGER_ID,
+				DEPARTMENT_ID 
+		   FROM employees e
+			<include refid="condition"></include>
+	  	 
+	  	
+	
+	
 	</select>
 	
 	<select id="getEmpInfo" parameterType="int" resultType="EmpVO">
 		SELECT *
-		FROM employees
-		WHERE employee_id = #{employeeId}
+		FROM   employees
+		WHERE  employee_id = #{employeeId}
 	</select>
 	
-	<insert id="insertEmp" 
-	        parameterType="EmpVO">
-		<selectKey keyProperty="employeeId"
-		           order="BEFORE"
-		           resultType="int">
-			SELECT employees_seq.nextval 
-			  FROM dual
+	<insert id="insertEmp" parameterType="EmpVO">
+		<selectKey keyProperty="employeeId" order="BEFORE" resultType="int">
+			select employees_seq.nextval from dual
 		</selectKey>
 		INSERT INTO employees
-			(
-			  employee_id
-			, first_name
-			, last_name
-			, email
-			, phone_number
-			, hire_date
-			, job_id
-			<if test="salary != null">
-			, salary
-			</if>
-			, commission_pct
-			, manager_id
-			, department_id
-			, photo
-			)
-		VALUES
-			(
-			  #{employeeId}
-			, #{firstName}
-			, #{lastName}
-			, #{email}
-			, #{phoneNumber}
-			, #{hireDate}
-			, #{jobId}
-			<if test="salary != null">
-			, #{salary}
-			</if>
-			, #{commissionPct}
-			, #{managerId}
-			, #{departmentId}
-			, #{photo}
-			)
+					(EMPLOYEE_ID
+					,FIRST_NAME
+					,LAST_NAME
+					,EMAIL
+					,HIRE_DATE
+					,JOB_ID
+					<if test="salary != null">,SALARY</if>
+					,MANAGER_ID
+					,DEPARTMENT_ID
+					,photo)
+		    VALUES  (
+		    		#{employeeId}
+		    		,#{firstName}
+		    		,#{lastName}
+		    		,#{email}
+		    		,#{hireDate}
+		    		,#{jobId}
+		    		<if test="salary != null">,#{salary}</if>
+		    		,#{managerId}
+		    		,#{departmentId}
+		    		,#{photo}
+		    		)
 	</insert>
 	
-	<delete id="deleteEmp">
+	<delete id="deleteEmp" parameterType="int">
 		DELETE FROM employees
 		WHERE employee_id = #{employeeId}
 	</delete>
 	
-	<<select id="getStat" resultType="map">
-		SELECT e.department_id "id"
-			 , d.department_name "name"
-			 , count(*) "cnt"
-		  FROM employees e 
-		  JOIN departments d
-	 	    ON e.department_id = d.department_id
-	     WHERE e.department_id IS NOT NULL
-	  GROUP BY e.department_id, d.department_name
+	<select id="getStat" resultType="map">
+		SELECT e.department_id, 
+			   d.department_name "name", 
+			   count(*) "cnt" 
+		  FROM employees e JOIN departments d
+			ON e.department_id = d.department_id
+		 WHERE e.department_id IS NOT NULL
+		 GROUP BY e.department_id, d.department_name
 	</select>
+	
+	<update id="updateEmp" parameterType="EmpVO">
+		UPDATE employees
+		SET LAST_NAME = #{lastName},
+			HIRE_DATE = #{hireDate},
+			JOB_ID = #{jobId},
+			EMAIL = #{email}
+		WHERE employee_id = #{employeeId}
+	</update>	
+	
 </mapper>
