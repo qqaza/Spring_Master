@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.demo.common.paging.Paging;
 import com.example.demo.emp.EmpVo;
 import com.example.demo.emp.SearchVO;
 import com.example.demo.emp.mapper.EmpMapper;
@@ -42,9 +43,19 @@ public class EmpController {
 		return "result";
 	}
 	
-	@RequestMapping("/empList") //forward
-	public String empList(Model model, EmpVo vo, SearchVO svo){
-		model.addAttribute("copmpanyName", "<i>예담주식회사</i>");
+	@RequestMapping("/empList") //forward 리스트 출력
+	public String empList(Model model, EmpVo vo, SearchVO svo, Paging pvo){
+		
+		//페이징 처리
+		pvo.setPageUnit(5); //데이터 수
+		pvo.setPageSize(3); // 페이지 번호
+		svo.setStart(pvo.getFirst());
+		svo.setEnd(pvo.getLast()); 
+		pvo.setTotalRecord(mapper.getCount(vo, svo));
+		model.addAttribute("paging",pvo); // 이줄 지워도 페이징 처리는 가능.
+		
+		
+		// 목록 조회
 		model.addAttribute("empList", mapper.getEmpList(vo, svo));
 		return "empList"; 
 	}
@@ -75,14 +86,19 @@ public class EmpController {
 		return mv; //페이지 명(result)
 		
 	}
-		
-	
+		//상세조회
+	@GetMapping("/info/{empId}")
+	public String info(@PathVariable int empId, Model model) {
+		model.addAttribute("emp", mapper.getEmpInfo(empId));
+		return "empInfo"; 
+	}
+	//수정
 	@GetMapping("/update/{empId}")
 	public String update(@PathVariable int empId) {
 		System.out.println(empId);
 		return "index"; //리턴값이 /tamplate/index.html 을 찾아서 페이지를 넘겨준다
 	}
-	
+	//삭제
 	@GetMapping("/delete")
 	public String delete(int employeeId, String name) {
 		System.out.println(employeeId + ":" + name);

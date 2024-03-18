@@ -11,7 +11,10 @@ import com.example.demo.emp.SearchVO;
 public interface EmpMapper {
 	List<EmpVo> getEmpList(EmpVo vo, SearchVO svo); //전체조회 , 페이징
 	EmpVo getEmpInfo(int employeeId); //단건조회
-	    int insertEmp(EmpVo empVO); // 등록
-		int deleteEmp(int employeeId); // 삭제
-		List<Map<String,Object>>getStat();
+	int insertEmp(EmpVo empVO); // 등록
+	int deleteEmp(int employeeId); // 삭제
+	List<Map<String,Object>> getStat(); //부서별 인원수 조회
+		
+//		@Select("select count(*) from employees")
+		public long getCount(EmpVo vo, SearchVO svo);
 }

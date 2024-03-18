@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+<head>
+<meta charset="UTF-8">
+<title>ReplyMng.html</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h3>댓글목록</h3>
+		<table>
+			<thead>
+				<tr>
+					<th>rno</th>
+					<th>board_no</th>
+					<th>reply</th>
+					<th>replyer</th>
+					<th>replyDate</th>
+					<th>updateDate</th>
+					<th>수정|삭제</th>
+				</tr>
+			</thead>
+			<tbody id="ReolyList">
+			</tbody>
+
+		</table>
+		<h3>사원(등록,조회)</h3>
+		<form method="post" name="frm">
+			reply<input name="reply"> replyer<input
+				name="replyer"> 
+				replyDate<input name="replyDate">
+				updateDate<input name="updateDate">
+			<button type="button" onclick="saveReq()">등록</button>
+		</form>
+		<script>
+		//등록요청
+		function saveReq(){
+			
+			const reply=frm.reply.value;
+			const replyer=frm.replyer.value;
+			const replyDate=frm.replyDate.value;
+			const updateDate=frm.updateDate.value;
+			let param = {reply, replyer,replyDate,updateDate}
+			fetch("/ajax/Reply",{
+				method: "post",
+				headers: {
+				      "Content-Type": "application/json",
+				    },
+				body : JSON.stringify(param)
+			})
+			.then(res => res.json())
+			.then(res => saveRes(res))
+		}
+		
+		//등록 응답
+		function saveRes(res){
+			console.log(res)
+	//listReq()
+}
+		
+		</script>
+		</div>
+</body>
+</html>

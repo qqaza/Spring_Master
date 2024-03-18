@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{layout/layout}">
+<head>
+<meta charset="UTF-8">
+<title>ReplyMng.html</title>
+</head>
+<body>
+	<div layout:fragment="content">
+		<h3>댓글목록</h3>
+		<table>
+			<thead>
+				<tr>
+					<th>rno</th>
+					<th>board_no</th>
+					<th>reply</th>
+					<th>replyer</th>
+					<th>replyDate</th>
+					<th>updateDate</th>
+					<th>수정|삭제</th>
+				</tr>
+			</thead>
+			<tbody id="ReolyList">
+			</tbody>
+
+		</table>
+		<h3>사원(등록,조회)</h3>
+		<form method="post" name="frm">
+			reply<input name="reply"> replyer<input
+				name="replyer"> 
+			<button type="button" onclick="saveReq()">등록</button>
+		</form>
+		</div>
+</body>
+</html>
