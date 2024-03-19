@@ -1,6 +1,7 @@
 package com.example.demo.emp.web;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,19 +20,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.demo.common.paging.Paging;
 import com.example.demo.emp.EmpVo;
 import com.example.demo.emp.SearchVO;
-import com.example.demo.emp.mapper.EmpMapper;
+import com.example.demo.emp.service.EmpService;
 
 @Controller // 컨테이너 빈 등록 + 사용자요청처리할 커맨드 핸들러 변환
+
 public class EmpController {
 	
-	@Autowired EmpMapper mapper; //의존성 주입 (DI = Dependency Injection)
+	@Autowired EmpService empService; //의존성 주입 (DI = Dependency Injection)
 	
-	@RequestMapping("/ajaxEmp")
-	@ResponseBody
-	public List<EmpVo> ajaxEmp(){
-		return mapper.getEmpList(null, null);
-	}
-	
+
 	//ajax응답과 비슷함
 	@PostMapping("/insert2")  //148교재
 	public ResponseEntity<EmpVo> insert2(EmpVo vo) {
@@ -46,17 +43,19 @@ public class EmpController {
 	@RequestMapping("/empList") //forward 리스트 출력
 	public String empList(Model model, EmpVo vo, SearchVO svo, Paging pvo){
 		
-		//페이징 처리
+		//페이징 처리 + 목록조회
 		pvo.setPageUnit(5); //데이터 수
 		pvo.setPageSize(3); // 페이지 번호
 		svo.setStart(pvo.getFirst());
 		svo.setEnd(pvo.getLast()); 
-		pvo.setTotalRecord(mapper.getCount(vo, svo));
+		
+		Map<String,Object> map = empService.getEmpList(vo, svo);
+		pvo.setTotalRecord((Long)map.get("count"));
 		model.addAttribute("paging",pvo); // 이줄 지워도 페이징 처리는 가능.
 		
 		
 		// 목록 조회
-		model.addAttribute("empList", mapper.getEmpList(vo, svo));
+		model.addAttribute("empList", map.get("data"));
 		return "empList"; 
 	}
 	
@@ -71,7 +70,6 @@ public class EmpController {
 	
 	
 	@PostMapping("/insert")
-
 	public ModelAndView insert(@ModelAttribute("emp") EmpVo vo, Model model) {
 		System.out.println(vo);
 //		mapper.insertEmp(vo);
@@ -86,10 +84,10 @@ public class EmpController {
 		return mv; //페이지 명(result)
 		
 	}
-		//상세조회
+		//단건조회
 	@GetMapping("/info/{empId}")
 	public String info(@PathVariable int empId, Model model) {
-		model.addAttribute("emp", mapper.getEmpInfo(empId));
+		model.addAttribute("emp", empService.getEmpInfo(empId));
 		return "empInfo"; 
 	}
 	//수정
@@ -101,8 +99,8 @@ public class EmpController {
 	//삭제
 	@GetMapping("/delete")
 	public String delete(int employeeId, String name) {
-		System.out.println(employeeId + ":" + name);
-		return "index"; //리턴값이 /tamplate/index.html 을 찾아서 페이지를 넘겨준다
+		empService.deleteEmp(employeeId);
+		return "redirect:empList"; // 삭제후 리스트로 돌아가기
 	}
 	
 	@GetMapping("/")
@@ -110,12 +108,5 @@ public class EmpController {
 		return "index"; //리턴값이 /tamplate/index.html 을 찾아서 페이지를 넘겨준다
 	}
 	
-	
-	
-//	@RequestMapping("/empList")
-//	public String empList(Model model,EmpVo vo, SearchVO svo){
-//		model.addAttribute("empList", mapper.getEmpList(vo, svo));
-//		return "empList"; 
-//	}
 		
 }
