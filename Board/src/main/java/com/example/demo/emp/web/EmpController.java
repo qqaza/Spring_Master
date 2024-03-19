@@ -1,5 +1,8 @@
 package com.example.demo.emp.web;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,9 +32,16 @@ public class EmpController {
 
 	// 등록 처리 --> employees 테이블에 photo 컬럼 추가
 	@PostMapping("/insert")
-	public String insert(@ModelAttribute("emp") EmpVo vo, MultipartFile photoFile) {
-		// 파일 업로드
-		vo.setPhoto(photoFile.getOriginalFilename());
+	public String insert(@ModelAttribute("emp") EmpVo vo, MultipartFile photoFile)
+			throws IllegalStateException, IOException {
+		System.out.println(vo);
+		if (photoFile != null) {
+			// 파일 생성
+			File file = new File("d:/upload", photoFile.getOriginalFilename());
+			// 파일 저장
+			photoFile.transferTo(file);
+			vo.setPhoto(photoFile.getOriginalFilename());
+		}
 		mapper.insertEmp(vo);
 		return "redirect:/emp/list";
 	}
@@ -39,8 +49,8 @@ public class EmpController {
 	// 수정페이지 이동
 	@GetMapping("/emp/update/{employeeId}")
 	public String update(Model model, @PathVariable int employeeId) {
-		model.addAttribute("emp", Mapper.getEmpInfo(employeeId));
-		return "empInfo";
+		model.addAttribute("empVo", mapper.getEmpInfo(employeeId));
+		return "/emp/update";
 	}
 
 	// 수정처리

@@ -1,0 +1,22 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+<h2>board 상세조회</h2>
+	<form action="/update" method="post">
+	boardNo : <input type="text" name="boardNo" th:value="${board.boardNo}"> 
+	title : <input name="title" th:value="${board.title}">
+	content : <input name="content" th:value="${board.content}">
+	writer : <input name="writer" th:value="${board.writer}">
+	writeDate : <input name="writeDate" th:value="${#dates.format(board.writeDate,'yyyy/MM/dd')}">
+	image : <input name="image" th:value="${board.image}">
+	<a th:href="@{/deletes/{boardNo}(boardNo=${board.boardNo})}">삭제</a>
+	<button type="submit">수정</button>
+	<a th:href="@{/board/list}">리스트로 이동</a>
+	</form>
+</body>
+</html>

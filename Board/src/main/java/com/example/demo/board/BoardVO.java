@@ -2,6 +2,11 @@ package com.example.demo.board;
 
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 public class BoardVO {
 	
 	int boardNo;
@@ -12,7 +17,6 @@ public class BoardVO {
 	int clickCnt;
 	String image;
 	
-	int start = 1;
-	int end = 10;
+	
 }
 

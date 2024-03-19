@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.demo.board.mapper.BoardMapper">
+	<sql id="condition">
+		<where>
+			<if test="title != null">
+				title like '%'||#{title}||'%'
+			</if>
+			<if test="content != null">
+				AND content like '%'||#{content}||'%'
+			</if>
+			<if test="writer != null">
+				AND writer like '%'||#{writer}||'%'
+			</if>
+		</where>
+	</sql>
+	
+	<select id="getBoardList" resultType="boardVO">
+		SELECT * FROM (SELECT rownum as rn, a.* FROM(
+		
+			SELECT BOARD_NO
+				 , TITLE
+				 , CONTENT
+				 , WRITER
+				 , WRITE_DATE
+				 , CLICK_CNT
+				 , IMAGE
+			  FROM board
+		<include refid="condition"></include>
+			ORDER BY BOARD_NO
+		
+		) a WHERE rownum <![CDATA[<= #{end} ) b      WHERE rn >= #{start}]]>
+	</select>
+
+	<select id="getBoardInfo" parameterType="int" resultType="BoardVO">
+		SELECT BOARD_NO
+			 , TITLE
+			 , CONTENT
+			 , WRITER
+			 , WRITE_DATE
+			 , CLICK_CNT
+			 , IMAGE
+		  FROM board
+		 WHERE BOARD_NO = #{boardNo}
+	</select>
+	
+	<insert id="insertBoard" parameterType="BoardVO">
+		<selectKey keyProperty="boardNo" 
+				   order="BEFORE"
+				   resultType="int">
+			select BOARD_SEQ.nextval from dual
+		</selectKey>
+		INSERT INTO board(
+				BOARD_NO
+			  , TITLE
+			  , CONTENT
+			  , WRITER
+			  , WRITE_DATE
+			  , CLICK_CNT
+			  , IMAGE 
+		)
+		VALUES(
+			  #{boardNo}
+			, #{title}
+			, #{content}
+			, #{writer}
+			, #{writeDate}
+			, #{clickCnt}
+			, #{image}
+		)
+	</insert>
+	
+	<delete id="deleteBoard" parameterType="int">
+		DELETE FROM board
+		WHERE board_no = #{boardNo}
+	</delete>
+	
+	<update id="updateBoard" parameterType="BoardVO">
+		UPDATE board
+			<set>
+				<if test="title != null">
+					title = #{title}
+				</if>
+				<if test="content != null">
+					, content = #{content}
+				</if>
+			</set>
+		 WHERE board_no = #{boardNo}
+	</update>
+</mapper>
