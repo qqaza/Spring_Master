@@ -28,5 +28,10 @@ public class EmpVo { //등록VO
 	 
 	 
 	 String photo;
+
+
+	
+		
+	
 	 
 }
