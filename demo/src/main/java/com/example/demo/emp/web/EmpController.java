@@ -50,6 +50,7 @@ public class EmpController {
 		svo.setEnd(pvo.getLast()); 
 		
 		Map<String,Object> map = empService.getEmpList(vo, svo);
+		
 		pvo.setTotalRecord((Long)map.get("count"));
 		model.addAttribute("paging",pvo); // 이줄 지워도 페이징 처리는 가능.
 		
@@ -67,23 +68,28 @@ public class EmpController {
 		return "redirect:empResult";
 	}
 	
+	//등록
+	@GetMapping("/insert")
+	public void insert() {
+		
+	}	
 	
 	
 	@PostMapping("/insert")
 	public ModelAndView insert(@ModelAttribute("emp") EmpVo vo, Model model) {
 		System.out.println(vo);
-//		mapper.insertEmp(vo);
+		empService.insertEmp(vo);
 		//커맨드객체는 자동으로 model에 추가되고 view페이지에 볼수있음
-		//model.addAttribute("empVo", vo);
-//		model.addAttribute("insertResult", "success");
 		
 		ModelAndView mv = new ModelAndView();
-		mv.setViewName("result");
+		mv.setViewName("/hello");
 		mv.addObject("insertResult", "success");
-		mv.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+		//mv.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
 		return mv; //페이지 명(result)
 		
 	}
+
+	
 		//단건조회
 	@GetMapping("/info/{empId}")
 	public String info(@PathVariable int empId, Model model) {
