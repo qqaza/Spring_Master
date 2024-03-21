@@ -1,22 +1,61 @@
 
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
 </head>
 <body>
-<h2>board 상세조회</h2>
-	<form action="/update" method="post">
-	boardNo : <input type="text" name="boardNo" th:value="${board.boardNo}"> 
-	title : <input name="title" th:value="${board.title}">
-	content : <input name="content" th:value="${board.content}">
-	writer : <input name="writer" th:value="${board.writer}">
-	writeDate : <input name="writeDate" th:value="${#dates.format(board.writeDate,'yyyy/MM/dd')}">
-	image : <input name="image" th:value="${board.image}">
-	<a th:href="@{/deletes/{boardNo}(boardNo=${board.boardNo})}">삭제</a>
-	<button type="submit">수정</button>
-	<a th:href="@{/board/list}">리스트로 이동</a>
-	</form>
+	<h2>보드조회</h2>
+	<table>
+		<thead>
+		<tr>
+			<th>번호</th>
+			<th>작성자</th>
+			<th>제목</th>
+			<th>내용</th>
+			<th>작성일</th>
+			<th>조회수</th>
+			<th>이미지</th>
+			<th></th>
+		</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td id="boardNumber">[[${info.boardNo}]]</td>
+				<td>[[${info.title}]]</td>
+				<td>[[${info.writer}]]</td>
+				<td>[[${info.content}]]</td>
+				<td>[[${info.writerDate}]]</td>
+				<td>[[${info.clickCnt}]]</td>
+				<td>[[${info.image}]]</td>
+				<td></td>
+			</tr>
+		</tbody>
+	</table>
+		<button id="delbtn">삭제</button>
+	<script>
+	delbtn.addEventListener("click", e=> {
+		delReq();
+	})
+	
+	function delReq() {
+		let param = boardNumber.innerText;
+		console.log(param);
+		fetch("/ajax/delete",{
+			method : "post",
+			headers: {
+			      "Content-Type": "application/json",
+			    },
+			body : JSON.stringify(param)
+		})
+		.then(res => delRes(res))
+	}
+	
+	function delRes(res) {
+		location.href= "/board/list"
+	}
+	</script>
 </body>
+
 </html>

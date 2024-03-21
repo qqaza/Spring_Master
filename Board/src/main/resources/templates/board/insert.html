@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,14 +5,42 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<h3>board(등록)</h3>
-	<form action="/inserts" method="post" enctype="multipart/form-data">
-		title : <input name="title">
-		content : <input name="content">
-		writer : <input name="writer">
-		writeDate : <input name="writeDate">
-		image : <input name="photofile" type="file">
-		<button type="submit">등록</button>
+	<h2>보드등록</h2>
+	<form method="post" name="frm">
+		작성자<input name="writer">
+		<br>제목<input name="title">
+		<br>내용<textarea name="content" ></textarea>
+		<br>이미지<input type="file" name="image">
+		<br><button type="button" id="saveBtn">등록</button>
 	</form>
+	<script>
+	
+		saveBtn.addEventListener("click", e=> {
+			saveReq();
+		})
+		// 등록 요청
+		function saveReq() {
+			const writer=frm.writer.value;
+			const title=frm.title.value;
+			const content=frm.content.value;
+			const image=frm.image.value;
+			let param = {writer, title, content, image }
+			fetch("/ajax/board",{
+				method : "post",
+				headers: {
+				      "Content-Type": "application/json",
+				    },
+				body : JSON.stringify(param)
+			})
+			.then(res => res.json())
+			.then(res => saveRes(res))
+		}
+	
+		// 등록 응답
+		function saveRes(res) {
+			location.href= "/board/list"
+		}
+	</script>
 </body>
+
 </html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h2>보드수정</h2>
+	<form method="post" name="frm">
+		번호<input name="boardNo" readonly th:value="${info.boardNo}">
+		작성자<input name="writer" readonly th:value="${info.writer}">
+		<br>제목<input name="title" th:value="${info.title}">
+		<br>내용<textarea name="content" th:text="${info.content}"></textarea>
+		<br><button type="button" id="modBtn">수정</button>
+	</form>
+		<script>
+	
+		modBtn.addEventListener("click", e=> {
+			modReq();
+		})
+		// 수정 요청
+		function modReq() {
+			const boardNo=frm.boardNo.value;
+			const title=frm.title.value;
+			const content=frm.content.value;
+			let param = {boardNo, title, content}
+			fetch("/ajax/update",{
+				method : "post",
+				headers: {
+				      "Content-Type": "application/json",
+				    },
+				body : JSON.stringify(param)
+			})
+			.then(res => res.json())
+			.then(res => modRes(res))
+		}
+	
+		// 수정 응답
+		function modRes(res) {
+			location.href= "/board/list"
+		}
+	</script>
+</body>
+
+</html>
